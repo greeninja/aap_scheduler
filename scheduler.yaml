@@ -6,13 +6,9 @@
     db_host: 192.168.122.12
     db_port: 3306
   tasks:
-    - name: Set update date
+    - name: Set update date query
       set_fact:
         update_date: "{{ '%Y-%m-%d' | strftime( (ansible_date_time.epoch|int) + (60*60*24*8) ) }}"
-
-    - name: Set pre check date
-      set_fact:
-        pre_check_date: "{{ '%Y-%m-%d' | strftime( (ansible_date_time.epoch|int) + (60*60*24) ) }}"
 
     - name: Get hosts from MySQL
       community.mysql.mysql_query:
@@ -24,27 +20,22 @@
         query: 'select * from patch where update_time like "{{ update_date }}%" and status = "Booked";'
       register: mysql_results
 
-    - name: Debug pre_check date
-      debug:
-        msg: "{{ '%Y-%m-%d %H:%M:00' | strftime(( (item.update_time | to_datetime('%Y-%m-%dT%H:%M:%S')).strftime('%s'))|int - (60*60*24*7)) }}"
+    - name: Build schedules
+      include_tasks: build_schedules.yaml
       loop: "{{ mysql_results.query_result[0] }}"
 
-    - name: Debug - rrule query string
-      debug:
-        msg: "{{ query('awx.awx.tower_schedule_rrule', 'none', start_date='2023-05-24 13:03:00', timezone='UTC') }}"
+    # - name: Test Create schedule
+    #   awx.awx.schedule:
+    #     name: Test schedule
+    #     state: present
+    #     unified_job_template: "Run Patching"
+    #     controller_host: "{{ controller_uri }}"
+    #     controller_username: "{{ controller_user }}"
+    #     controller_password: "{{ controller_passwd }}"
+    #     validate_certs: false
+    #     rrule: "{{ query('awx.awx.tower_schedule_rrule', 'none', start_date='2023-05-24 13:03:00', timezone='UTC') }}"
+    #   register: test_schedule_result
 
-    - name: Test Create schedule
-      awx.awx.schedule:
-        name: Test schedule
-        state: present
-        unified_job_template: "Run Patching"
-        controller_host: "{{ controller_uri }}"
-        controller_username: "{{ controller_user }}"
-        controller_password: "{{ controller_passwd }}"
-        validate_certs: false
-        rrule: "{{ query('awx.awx.tower_schedule_rrule', 'none', start_date='2023-05-24 13:03:00', timezone='UTC') }}"
-      register: test_schedule_result
-
-    - name: Show output of schedule creation
-      debug:
-        var: test_schedule_result
+    # - name: Show output of schedule creation
+    #   debug:
+    #     var: test_schedule_result
