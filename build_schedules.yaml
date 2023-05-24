@@ -22,11 +22,11 @@
     login_user: root
     login_password: "{{ mysql_passwd }}"
     login_port: "{{ db_port }}"
-    query: "update patch set status = 'Scheduled', pre_check_schedule_id = %s, pre_checks_time=%s, pre_checks_created=1 where id=%s"
+    query: "update patch set status = 'Scheduled', pre_check_schedule_id=%s, pre_checks_time=%s, pre_checks_created=1 where id=%s"
     positional_args:
       - "{{ pre_check_schedule.id }}"
       - "{{ pre_check_date }}"
-      - "{{ id }}"
+      - "{{ item.id }}"
 
 - name: Debug pre_check_schedule
   debug:
