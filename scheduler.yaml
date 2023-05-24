@@ -38,6 +38,9 @@
         name: Test schedule
         state: present
         unified_job_template: "Run Patching"
+        controller_host: "{{ controller_uri }}"
+        controller_username: "{{ controller_user }}"
+        controller_password: "{{ controller_passwd }}"
         rrule: "{{ query('awx.awx.tower_schedule_rrule', 'none', start_date='2023-05-24 13:03:00', timezone='UTC') }}"
       register: test_schedule_result
 
