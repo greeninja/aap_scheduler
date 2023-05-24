@@ -1,0 +1,30 @@
+---
+- name: Create Schedules
+  hosts: 127.0.0.1
+  connection: local
+  vars:
+    db_host: 192.168.122.12
+    db_port: 3306
+  tasks:
+    - name: Set update date
+      set_fact:
+        update_date: "{{ '%Y-%m-%d' | strftime( (ansible_date_time.epoch|int) + (60*60*24*8) ) }}"
+
+    - name: Set pre check date
+      set_fact:
+        pre_check_date: "{{ '%Y-%m-%d' | strftime( (ansible_date_time.epoch|int) + (60*60*24) ) }}"
+
+    - name: Get hosts from MySQL
+      community.mysql.mysql_query:
+        login_host: "{{ db_host }}"
+        login_db: patching
+        login_user: root
+        login_password: "{{ mysql_passwd }}"
+        login_port: "{{ db_port }}"
+        query: 'select * from patch where update_time like "{{ update_date }}%" and status = "Booked";'
+      register: mysql_results
+
+    - name: Debug pre_check date
+      debug:
+        msg: "{{ '%Y-%m-%d %H:%M:00' | strftime(( (item.update_time | to_datetime('%Y-%m-%dT%H:%M:%S')).strftime('%s'))|int - (60*60*24*7)) }}"
+      loop: "{{ mysql_results.query_result[0] }}"

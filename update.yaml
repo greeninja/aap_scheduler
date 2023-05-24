@@ -1,0 +1,54 @@
+---
+- name: Run Updates
+  hosts: 127.0.0.1
+  connection: local
+  vars:
+    db_host: 192.168.122.12
+    db_port: 3306
+  tasks:
+    - name: Set update date
+      set_fact:
+        update_date: "{{ '%Y-%m-%d %H:%M' | strftime( ansible_date_time.epoch|int ) }}"
+
+    - name: Query filter
+      debug:
+        var: update_date
+
+    - name: Get hosts from MySQL
+      community.mysql.mysql_query:
+        login_host: "{{ db_host }}"
+        login_db: patching
+        login_user: root
+        login_password: "{{ mysql_passwd }}"
+        login_port: "{{ db_port }}"
+        query: 'select * from patch where update_time like "{{ update_date }}%" and status = "PreChecksComplete" and pre_checks_complete=1;'
+      register: mysql_results
+
+    - name: Add hosts to Inventory
+      ansible.builtin.add_host:
+        name: "{{ item.server }}"
+        groups: update
+        id: "{{ item.id }}"
+      loop: "{{ mysql_results.query_result[0] }}"
+
+- name: Run pre checks
+  hosts: update
+  connection: local
+  vars:
+    db_host: 192.168.122.12
+    db_port: 3306
+  tasks:
+    - name: Pause for 5 minutes to simulate update
+      ansible.builtin.pause:
+        minutes: 2
+    - name: Update DB - pre checks complete
+      community.mysql.mysql_query:
+        login_host: "{{ db_host }}"
+        login_db: patching
+        login_user: root
+        login_password: "{{ mysql_passwd }}"
+        login_port: "{{ db_port }}"
+        query: "update patch set status = 'Updates', job_id = %s where id=%s"
+        positional_args:
+          - "{{ tower_job_id }}"
+          - "{{ id }}"
