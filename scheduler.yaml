@@ -8,7 +8,7 @@
   tasks:
     - name: Set update date query
       set_fact:
-        update_date: "{{ '%Y-%m-%d' | strftime( (ansible_date_time.epoch|int) + (60*60*24*8) ) }}"
+        update_date: "{{ '%Y-%m-%d' | strftime( (ansible_date_time.epoch|int) + (60*60*24*7) ) }}"
 
     - name: Get hosts from MySQL
       community.mysql.mysql_query:
