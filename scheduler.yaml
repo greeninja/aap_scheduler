@@ -17,25 +17,9 @@
         login_user: root
         login_password: "{{ mysql_passwd }}"
         login_port: "{{ db_port }}"
-        query: 'select * from patch where update_time like "{{ update_date }}%" and status = "Booked";'
+        query: 'select * from patch where update_time like "{{ update_date }}%";'
       register: mysql_results
 
     - name: Build schedules
       include_tasks: build_schedules.yaml
       loop: "{{ mysql_results.query_result[0] }}"
-
-    # - name: Test Create schedule
-    #   awx.awx.schedule:
-    #     name: Test schedule
-    #     state: present
-    #     unified_job_template: "Run Patching"
-    #     controller_host: "{{ controller_uri }}"
-    #     controller_username: "{{ controller_user }}"
-    #     controller_password: "{{ controller_passwd }}"
-    #     validate_certs: false
-    #     rrule: "{{ query('awx.awx.tower_schedule_rrule', 'none', start_date='2023-05-24 13:03:00', timezone='UTC') }}"
-    #   register: test_schedule_result
-
-    # - name: Show output of schedule creation
-    #   debug:
-    #     var: test_schedule_result
