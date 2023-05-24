@@ -2,13 +2,15 @@
 - name: Run Updates
   hosts: 127.0.0.1
   connection: local
+  gather_facts: false
   vars:
     db_host: 192.168.122.12
     db_port: 3306
   tasks:
+    # Using shell as ansible_date_time fact returns UTC
     - name: Set update date
-      set_fact:
-        update_date: "{{ '%Y-%m-%d %H:%M' | strftime( ansible_date_time.epoch|int ) }}"
+      shell: "date +'%Y-%m-%d %H:%M'"
+      register: update_date
 
     - name: Query filter
       debug:
