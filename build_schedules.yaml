@@ -36,14 +36,6 @@
   set_fact:
     update_date_time: "{{ item.update_time | to_datetime('%Y-%m-%dT%H:%M:00')}}"
 
-- name: Debug update time
-  debug:
-    msg: "{{ item.server }} - update scheduled: {{ update_date_time }}"
-
-- name: Debug rrule query
-  debug:
-    msg: "{{ query('awx.awx.tower_schedule_rrule', 'none', start_date=update_date_time, timezone='UTC') }}"
-
 - name: Create Update Schedule
   awx.awx.schedule:
     name: "Patching - {{ pre_check_date }}"
@@ -67,7 +59,3 @@
     positional_args:
       - "{{ update_schedule.id }}"
       - "{{ item.id }}"
-
-- name: Debug update_schedule
-  debug:
-    var: update_schedule
