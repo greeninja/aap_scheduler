@@ -1,0 +1,6 @@
+collections:
+  # Install a collection from Ansible Galaxy.
+  - name: community.mysql
+    source: https://galaxy.ansible.com
+  - name: awx.awx
+    source: https://galaxy.ansible.com
