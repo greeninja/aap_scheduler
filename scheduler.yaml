@@ -17,7 +17,7 @@
         login_user: root
         login_password: "{{ mysql_passwd }}"
         login_port: "{{ db_port }}"
-        query: 'select * from patch where update_time like "{{ update_date }}%";'
+        query: 'select * from patch where update_time like "{{ update_date }}%" and status = "Booked";'
       register: mysql_results
 
     - name: Build schedules
