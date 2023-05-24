@@ -15,7 +15,7 @@
     - name: Set update date
       set_fact:
         update_date: "{{ shell_update_date.stdout }}"
-        
+
     - name: Query filter
       debug:
         var: update_date
@@ -54,7 +54,7 @@
         login_user: root
         login_password: "{{ mysql_passwd }}"
         login_port: "{{ db_port }}"
-        query: "update patch set status = 'Updates', job_id = %s where id=%s"
+        query: "update patch set status = 'Updated', job_id = %s where id=%s"
         positional_args:
           - "{{ tower_job_id }}"
           - "{{ id }}"
