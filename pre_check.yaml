@@ -10,7 +10,11 @@
     # Using shell as ansible_date_time fact returns UTC
     - name: Set update date
       shell: "date +'%Y-%m-%d %H:%M' -d '+7 days'"
-      register: update_date
+      register: shell_update_date
+
+    - name: Set update date
+      set_fact:
+        update_date: "{{ shell_update_date.stdout }}"
 
     - name: Query filter
       debug:

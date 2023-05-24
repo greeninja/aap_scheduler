@@ -8,10 +8,14 @@
     db_port: 3306
   tasks:
     # Using shell as ansible_date_time fact returns UTC
-    - name: Set update date
+    - name: Get update date
       shell: "date +'%Y-%m-%d %H:%M'"
-      register: update_date
+      register: shell_update_date
 
+    - name: Set update date
+      set_fact:
+        update_date: "{{ shell_update_date.stdout }}"
+        
     - name: Query filter
       debug:
         var: update_date
