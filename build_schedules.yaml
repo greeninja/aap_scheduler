@@ -3,14 +3,6 @@
   set_fact:
     pre_check_date: "{{ '%Y-%m-%d %H:%M:00' | strftime(( (item.update_time | to_datetime('%Y-%m-%dT%H:%M:%S')).strftime('%s'))|int - (60*60*24*7)) }}"
 
-- name: Debug pre_check date
-  debug:
-    msg: "{{ item.server }} - Pre check scheduled {{ pre_check_date }}"
-
-- name: Debug rrule query
-  debug:
-    msg: "{{ query('awx.awx.tower_schedule_rrule', 'none', start_date=pre_check_date, timezone='UTC') }}"
-
 - name: Create Pre Check Schedule
   awx.awx.schedule:
     name: "Pre Check - {{ pre_check_date }}"
@@ -22,6 +14,19 @@
     validate_certs: false
     rrule: "{{ query('awx.awx.tower_schedule_rrule', 'none', start_date=pre_check_date, timezone='UTC') }}"
   register: pre_check_schedule
+
+- name: Update DB - Pre Checks scheduled
+  community.mysql.mysql_query:
+    login_host: "{{ db_host }}"
+    login_db: patching
+    login_user: root
+    login_password: "{{ mysql_passwd }}"
+    login_port: "{{ db_port }}"
+    query: "update patch set status = 'Scheduled', pre_check_schedule_id = %s, pre_checks_time=%s, pre_checks_created=1 where id=%s"
+    positional_args:
+      - "{{ pre_check_schedule.id }}"
+      - "{{ pre_check_date }}"
+      - "{{ id }}"
 
 - name: Debug pre_check_schedule
   debug:
