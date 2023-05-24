@@ -57,5 +57,5 @@
         query: "update patch set status = 'PreChecksComplete', pre_checks_job_id = %s, pre_checks_time=%s, pre_checks_complete=1 where id=%s"
         positional_args:
           - "{{ tower_job_id }}"
-          - "{{ ansible_date_time.iso8601 }}"
+          - "{{ ansible_date_time.date }} {{ ansible_date_time.time }}"
           - "{{ id }}"
