@@ -1,0 +1,24 @@
+---
+- name: Create Schedules
+  hosts: 127.0.0.1
+  connection: local
+  vars:
+    api_host: "http://127.0.0.1:8080/patch"
+  tasks:
+    - name: Set update date query
+      set_fact:
+        update_date: "{{ '%Y-%m-%d' | strftime( (ansible_date_time.epoch|int) + (60*60*24*7) ) }}"
+
+    - name: Get hosts from API
+      ansible.builtin.uri:
+        url: "{{ api_host}}/date/{{ update_date }}"
+        return_content: true
+      register: api_results
+
+    - name: Debug output
+      debug:
+        var: api_results.content
+
+    - name: Build schedules
+      include_tasks: build_schedules_api.yaml
+      loop: "{{ api_results.content }}"
