@@ -46,4 +46,9 @@
       ansible.builtin.uri:
         url: "{{ api_host}}/{{ item.ID }}"
         method: PUT
-        body: '{"Status": "PreCheckCompleted", "PreCheckStatus": "2", "PreCheckJobID": "{{ tower_job_id}}" }'
+        body_format: json
+        body:
+          Status: "PreCheckCompleted"
+          PreCheckStatus: "2"
+          PreCheckJobID: "{{ tower_job_id }}"
+        # '{"Status": "PreCheckCompleted", "PreCheckStatus": "2", "PreCheckJobID": " " }'
