@@ -7,7 +7,7 @@
   awx.awx.schedule:
     name: "Pre Check - {{ pre_check_date }}"
     state: present
-    unified_job_template: "Pre Checks"
+    unified_job_template: "Pre Checks API"
     controller_host: "{{ controller_uri }}"
     controller_username: "{{ controller_user }}"
     controller_password: "{{ controller_passwd }}"
@@ -37,7 +37,7 @@
   awx.awx.schedule:
     name: "Patching - {{ pre_check_date }}"
     state: present
-    unified_job_template: "Run Patching API"
+    unified_job_template: "Patch API"
     controller_host: "{{ controller_uri }}"
     controller_username: "{{ controller_user }}"
     controller_password: "{{ controller_passwd }}"
