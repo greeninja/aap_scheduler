@@ -24,7 +24,6 @@
       Status: PreCheckScheduled
       PreCheckStatus: "1"
       PreCheckScheduled: "1"
-      # '{"Status": "PreCheckScheduled", "PreCheckStatus": "1", "PreCheckScheduled": "1" }'
 
 - name: Debug pre_check_schedule
   debug:
@@ -55,4 +54,3 @@
       Status: "PatchScheduled"
       PatchScheduled: "1"
       PatchScheduleID: "{{ update_schedule.id }}"
-      # "{'Status': 'PatchScheduled', 'PatchScheduled': '1', 'PatchScheduleID': \"{{ update_schedule.id }}\" }"

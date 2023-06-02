@@ -15,10 +15,6 @@
         return_content: true
       register: api_results
 
-    - name: Debug output
-      debug:
-        var: api_results.content
-
     - name: Build schedules
       include_tasks: build_schedules_api.yaml
       loop: "{{ api_results.content }}"
