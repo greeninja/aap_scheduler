@@ -22,7 +22,7 @@
     validate_certs: false
     return_content: true
     method: POST
-    status_code: [200, 201]
+    status_code: [200, 201, 400]
     headers:
       Content-Type: application/json
       Authorization: "Bearer {{ controller_token }}"
@@ -68,7 +68,7 @@
     body_format: json
     validate_certs: false
     method: POST
-    status_code: [200, 201]
+    status_code: [200, 201, 400]
     headers:
       Authorization: "Bearer {{ controller_token }}"
     body:
