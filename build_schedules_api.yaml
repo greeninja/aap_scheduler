@@ -1,7 +1,7 @@
 ---
 - name: Set pre_check date
   set_fact:
-    pre_check_date: "{{ '%Y-%m-%d %H:%M:00' | strftime(( (item.PatchStart | to_datetime('%Y-%m-%dT%H:%M:%SZ')).strftime('%s'))|int - (60*60*24*7)) }}"
+    pre_check_date: "{{ '%Y-%m-%dT%H:%M:00Z' | strftime(( (item.PatchStart | to_datetime('%Y-%m-%d %H:%M:%S')).strftime('%s'))|int - (60*60*24*7)) }}"
 
 # - name: Create Pre Check Schedule
 #   awx.awx.schedule:
@@ -45,7 +45,7 @@
 
 - name: Set update date
   set_fact:
-    update_date_time: "{{ item.PatchStart | to_datetime('%Y-%m-%dT%H:%M:00Z')}}"
+    update_date_time: "{{ item.PatchStart | to_datetime('%Y-%m-%d %H:%M:00')}}"
 
 # - name: Create Update Schedule
 #   awx.awx.schedule:
