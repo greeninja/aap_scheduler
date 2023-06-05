@@ -1,18 +1,32 @@
 ---
 - name: Set pre_check date
   set_fact:
-    pre_check_date: "{{ '%Y-%m-%d %H:%M:00' | strftime(( (item.PatchStart | to_datetime('%Y-%m-%d %H:%M:%S')).strftime('%s'))|int - (60*60*24*7)) }}"
+    pre_check_date: "{{ '%Y-%m-%d %H:%M:00' | strftime(( (item.PatchStart | to_datetime('%Y-%m-%dT%H:%M:%SZ')).strftime('%s'))|int - (60*60*24*7)) }}"
+
+# - name: Create Pre Check Schedule
+#   awx.awx.schedule:
+#     name: "Pre Check - {{ pre_check_date }}"
+#     state: present
+#     unified_job_template: "Pre Check API"
+#     controller_host: "{{ controller_uri }}"
+#     controller_username: "{{ controller_user }}"
+#     controller_password: "{{ controller_passwd }}"
+#     validate_certs: false
+#     rrule: "{{ query('awx.awx.tower_schedule_rrule', 'none', start_date=pre_check_date, timezone='UTC') }}"
+#   register: pre_check_schedule
 
 - name: Create Pre Check Schedule
-  awx.awx.schedule:
-    name: "Pre Check - {{ pre_check_date }}"
-    state: present
-    unified_job_template: "Pre Check API"
-    controller_host: "{{ controller_uri }}"
-    controller_username: "{{ controller_user }}"
-    controller_password: "{{ controller_passwd }}"
+  ansible.builtin.uri:
+    url: "{{ controller_uri }}"
+    body_format: json
     validate_certs: false
-    rrule: "{{ query('awx.awx.tower_schedule_rrule', 'none', start_date=pre_check_date, timezone='UTC') }}"
+    method: POST
+    headers:
+      Authorization: "Bearer: {{ controller_token }}"
+    body:
+      name: "Pre Check - {{ pre_check_date }}"
+      unified_job_template: 18
+      rrule: "DTSTART:{{ pre_check_date }} RRULE:FREQ=DAILY;INTERVAL=1;COUNT=1"
   register: pre_check_schedule
 
 - name: Update API - Pre Checks Scheduled
@@ -31,19 +45,37 @@
 
 - name: Set update date
   set_fact:
-    update_date_time: "{{ item.PatchStart | to_datetime('%Y-%m-%d %H:%M:00')}}"
+    update_date_time: "{{ item.PatchStart | to_datetime('%Y-%m-%dT%H:%M:00Z')}}"
 
-- name: Create Update Schedule
-  awx.awx.schedule:
-    name: "Patching - {{ pre_check_date }}"
-    state: present
-    unified_job_template: "Patch API"
-    controller_host: "{{ controller_uri }}"
-    controller_username: "{{ controller_user }}"
-    controller_password: "{{ controller_passwd }}"
+# - name: Create Update Schedule
+#   awx.awx.schedule:
+#     name: "Patching - {{ pre_check_date }}"
+#     state: present
+#     unified_job_template: "Patch API"
+#     controller_host: "{{ controller_uri }}"
+#     controller_username: "{{ controller_user }}"
+#     controller_password: "{{ controller_passwd }}"
+#     validate_certs: false
+#     rrule: "{{ query('awx.awx.tower_schedule_rrule', 'none', start_date=update_date_time, timezone='UTC') }}"
+#   register: update_schedule
+
+- name: Create Pre Check Schedule
+  ansible.builtin.uri:
+    url: "{{ controller_uri }}"
+    body_format: json
     validate_certs: false
-    rrule: "{{ query('awx.awx.tower_schedule_rrule', 'none', start_date=update_date_time, timezone='UTC') }}"
+    method: POST
+    headers:
+      Authorization: "Bearer: {{ controller_token }}"
+    body:
+      name: "Patch - {{ pre_check_date }}"
+      unified_job_template: 19
+      rrule: "DTSTART:{{ pre_check_date }} RRULE:FREQ=DAILY;INTERVAL=1;COUNT=1"
   register: update_schedule
+
+- name: Debug update_schedule
+  debug:
+    var: update_schedule
 
 - name: Update API - Patch scheduled
   ansible.builtin.uri:
