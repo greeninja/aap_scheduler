@@ -41,6 +41,7 @@
       Status: PreCheckScheduled
       PreCheckStatus: "1"
       PreCheckScheduled: "1"
+  when: pre_check_schedule.status != "400"
 
 - name: Debug pre_check_schedule
   debug:
@@ -90,3 +91,4 @@
       Status: "PatchScheduled"
       PatchScheduled: "1"
       PatchScheduleID: "{{ update_schedule.json.id }}"
+  when: update_schedule.status != "400"
