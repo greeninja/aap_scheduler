@@ -24,11 +24,11 @@
     method: POST
     headers:
       Content-Type: application/json
-      Authorization: "Bearer: {{ controller_token }}"
+      Authorization: "Bearer {{ controller_token }}"
     body:
       name: "Pre Check - {{ pre_check_date }}"
       unified_job_template: 18
-      rrule: "DTSTART:{{ pre_check_date }} RRULE:FREQ=DAILY;INTERVAL=1;COUNT=1"
+      rrule: "DTSTART:{{ pre_check_date | to_datetime('%Y%m%dT%H%M%SZ') }} RRULE:FREQ=DAILY;INTERVAL=1;COUNT=1"
   register: pre_check_schedule
 
 - name: Update API - Pre Checks Scheduled
@@ -47,7 +47,7 @@
 
 - name: Set update date
   set_fact:
-    update_date_time: "{{ item.PatchStart | to_datetime('%Y-%m-%d %H:%M:00')}}"
+    update_date_time: "{{ item.PatchStart | to_datetime('%Y%m%dT%H%M00Z')}}"
 
 # - name: Create Update Schedule
 #   awx.awx.schedule:
@@ -68,7 +68,7 @@
     validate_certs: false
     method: POST
     headers:
-      Authorization: "Bearer: {{ controller_token }}"
+      Authorization: "Bearer {{ controller_token }}"
     body:
       name: "Patch - {{ pre_check_date }}"
       unified_job_template: 19
