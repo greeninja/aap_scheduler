@@ -28,7 +28,7 @@
     body:
       name: "Pre Check - {{ pre_check_date }}"
       unified_job_template: 18
-      rrule: "DTSTART:{{ (pre_check_date | to_datetime('%Y-%m-%dT%H:%M:%SZ')).strftime('%Y%m%dT%H:%M:00Z') }} RRULE:FREQ=DAILY;INTERVAL=1;COUNT=1"
+      rrule: "DTSTART:{{ (pre_check_date | to_datetime('%Y-%m-%dT%H:%M:%SZ')).strftime('%Y%m%dT%H%M00Z') }} RRULE:FREQ=DAILY;INTERVAL=1;COUNT=1"
   register: pre_check_schedule
 
 - name: Update API - Pre Checks Scheduled
@@ -72,7 +72,7 @@
     body:
       name: "Patch - {{ update_date_time }}"
       unified_job_template: 19
-      rrule: "DTSTART:{{ (update_date_time | to_datetime('%Y-%m-%dT%H:%M:%SZ')).strftime('%Y%m%dT%H:%M:00Z') }} RRULE:FREQ=DAILY;INTERVAL=1;COUNT=1"
+      rrule: "DTSTART:{{ (update_date_time | to_datetime('%Y-%m-%dT%H:%M:%SZ')).strftime('%Y%m%dT%H%M00Z') }} RRULE:FREQ=DAILY;INTERVAL=1;COUNT=1"
   register: update_schedule
 
 - name: Debug update_schedule
