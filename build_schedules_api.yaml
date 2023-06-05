@@ -90,5 +90,4 @@
     body:
       Status: "PatchScheduled"
       PatchScheduled: "1"
-      PatchScheduleID: "{{ update_schedule.json.id }}"
-  when: update_schedule.status != "400"
+      # PatchScheduleID: "{{ update_schedule.json.id }}"
