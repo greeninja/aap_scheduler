@@ -17,7 +17,7 @@
 
 - name: Create Pre Check Schedule
   ansible.builtin.uri:
-    url: "{{ controller_uri }}"
+    url: "{{ controller_uri }}/api/v2/schedules/"
     body_format: json
     validate_certs: false
     return_content: true
@@ -61,18 +61,18 @@
 #     rrule: "{{ query('awx.awx.tower_schedule_rrule', 'none', start_date=update_date_time, timezone='UTC') }}"
 #   register: update_schedule
 
-- name: Create Pre Check Schedule
+- name: Create Patch Schedule
   ansible.builtin.uri:
-    url: "{{ controller_uri }}"
+    url: "{{ controller_uri }}/api/v2/schedules/"
     body_format: json
     validate_certs: false
     method: POST
     headers:
       Authorization: "Bearer {{ controller_token }}"
     body:
-      name: "Patch - {{ pre_check_date }}"
+      name: "Patch - {{ update_date_time }}"
       unified_job_template: 19
-      rrule: "DTSTART:{{ pre_check_date }} RRULE:FREQ=DAILY;INTERVAL=1;COUNT=1"
+      rrule: "DTSTART:{{ (update_date_time | to_datetime('%Y-%m-%dT%H:%M:%SZ')).strftime('%Y%m%dT%H:%M:00Z') }} RRULE:FREQ=DAILY;INTERVAL=1;COUNT=1"
   register: update_schedule
 
 - name: Debug update_schedule
