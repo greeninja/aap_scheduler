@@ -1,19 +1,13 @@
 ---
+## Pre check schedules
+
 - name: Set pre_check date
   set_fact:
     pre_check_date: "{{ '%Y-%m-%dT%H:%M:00Z' | strftime(( (item.PatchStart | to_datetime('%Y-%m-%d %H:%M:%S')).strftime('%s'))|int - (60*60*24*7)) }}"
 
-# - name: Create Pre Check Schedule
-#   awx.awx.schedule:
-#     name: "Pre Check - {{ pre_check_date }}"
-#     state: present
-#     unified_job_template: "Pre Check API"
-#     controller_host: "{{ controller_uri }}"
-#     controller_username: "{{ controller_user }}"
-#     controller_password: "{{ controller_passwd }}"
-#     validate_certs: false
-#     rrule: "{{ query('awx.awx.tower_schedule_rrule', 'none', start_date=pre_check_date, timezone='UTC') }}"
-#   register: pre_check_schedule
+- name: Set rrule fact
+  set_fact:
+    rrule_pre_check: "DTSTART:{{ (pre_check_date | to_datetime('%Y-%m-%dT%H:%M:%SZ')).strftime('%Y%m%dT%H%M00Z') }} RRULE:FREQ=DAILY;INTERVAL=1;COUNT=1"
 
 - name: Create Pre Check Schedule
   ansible.builtin.uri:
@@ -22,15 +16,22 @@
     validate_certs: false
     return_content: true
     method: POST
-    status_code: [200, 201, 400]
+    status_code: [200, 201]
     headers:
       Content-Type: application/json
       Authorization: "Bearer {{ controller_token }}"
     body:
       name: "Pre Check - {{ pre_check_date }}"
-      unified_job_template: 18
-      rrule: "DTSTART:{{ (pre_check_date | to_datetime('%Y-%m-%dT%H:%M:%SZ')).strftime('%Y%m%dT%H%M00Z') }} RRULE:FREQ=DAILY;INTERVAL=1;COUNT=1"
+      unified_job_template: "{{ pre_check_template_id }}"
+      rrule: "{{ rrule_pre_check }}"
   register: pre_check_schedule
+  changed_when: pre_check_schedule.status == 201
+  when: pre_check_schedules | selectattr('rrule','equalto',rrule_pre_check) | list | count == 0
+
+- name: Update pre_check_schedules fact
+  set_fact:
+    pre_check_schedules: "{{ pre_check_schedules + [pre_check_schedule.json] }}"
+  when: pre_check_schedule.changed
 
 - name: Update API - Pre Checks Scheduled
   ansible.builtin.uri:
@@ -40,28 +41,33 @@
     body:
       Status: PreCheckScheduled
       PreCheckStatus: "1"
-      PreCheckScheduled: "1"
-  when: pre_check_schedule.status != "400"
+      PreCheckScheduled: "{{ pre_check_schedule.json.id }}"
+  register: result
+  changed_when: result.status == 200 or result.status == 201 or result.status == 204
+  when: pre_check_schedule.changed
 
-- name: Debug pre_check_schedule
-  debug:
-    var: pre_check_schedule
+- name: Update API - Pre checks already scheduled
+  ansible.builtin.uri:
+    url: "{{ api_host}}/{{ item.ID }}"
+    method: PUT
+    body_format: json
+    body:
+      Status: PreCheckScheduled
+      PreCheckStatus: "1"
+      PreCheckScheduled: "{{ (pre_check_schedules | selectattr('rrule','equalto',rrule_pre_check) | first).id }}"
+  register: result
+  changed_when: result.status == 200 or result.status == 201 or result.status == 204
+  when: pre_check_schedule is not changed
+
+## Patch Schedules
 
 - name: Set update date
   set_fact:
     update_date_time: "{{ item.PatchStart | to_datetime('%Y-%m-%d %H:%M:00')}}"
 
-# - name: Create Update Schedule
-#   awx.awx.schedule:
-#     name: "Patching - {{ pre_check_date }}"
-#     state: present
-#     unified_job_template: "Patch API"
-#     controller_host: "{{ controller_uri }}"
-#     controller_username: "{{ controller_user }}"
-#     controller_password: "{{ controller_passwd }}"
-#     validate_certs: false
-#     rrule: "{{ query('awx.awx.tower_schedule_rrule', 'none', start_date=update_date_time, timezone='UTC') }}"
-#   register: update_schedule
+- name: Set patch rrule fact
+  set_fact:
+    rrule_patch: "DTSTART:{{ (update_date_time | to_datetime('%Y-%m-%d %H:%M:%S')).strftime('%Y%m%dT%H%M00Z') }} RRULE:FREQ=DAILY;INTERVAL=1;COUNT=1"
 
 - name: Create Patch Schedule
   ansible.builtin.uri:
@@ -69,18 +75,21 @@
     body_format: json
     validate_certs: false
     method: POST
-    status_code: [200, 201, 400]
+    status_code: [200, 201]
     headers:
       Authorization: "Bearer {{ controller_token }}"
     body:
       name: "Patch - {{ update_date_time }}"
-      unified_job_template: 19
+      unified_job_template: "{{ patch_template_id }}"
       rrule: "DTSTART:{{ (update_date_time | to_datetime('%Y-%m-%d %H:%M:%S')).strftime('%Y%m%dT%H%M00Z') }} RRULE:FREQ=DAILY;INTERVAL=1;COUNT=1"
   register: update_schedule
+  changed_when: update_schedule.status == 201
+  when: patch_schedules | selectattr('rrule','equalto',rrule_patch) | list | count == 0
 
-- name: Debug update_schedule
-  debug:
-    var: update_schedule
+- name: Update patch_schedules fact
+  set_fact:
+    patch_schedules: "{{ patch_schedules + [update_schedule.json] }}"
+  when: update_schedule.changed
 
 - name: Update API - Patch scheduled
   ansible.builtin.uri:
@@ -90,4 +99,20 @@
     body:
       Status: "PatchScheduled"
       PatchScheduled: "1"
-      # PatchScheduleID: "{{ update_schedule.json.id }}"
+      PatchScheduleID: "{{ update_schedule.json.id }}"
+  register: result
+  changed_when: result.status == 200 or result.status == 201 or result.status == 204
+  when: update_schedule.changed
+
+- name: Update API - Patch already scheduled
+  ansible.builtin.uri:
+    url: "{{ api_host}}/{{ item.ID }}"
+    method: PUT
+    body_format: json
+    body:
+      Status: "PatchScheduled"
+      PatchScheduled: "1"
+      PatchScheduleID: "{{ (patch_schedules | selectattr('rrule','equalto',rrule_patch) | first).id }}"
+  register: result
+  changed_when: result.status == 200 or result.status == 201 or result.status == 204
+  when: update_schedule is not changed

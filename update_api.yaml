@@ -22,7 +22,7 @@
 
     - name: Get hosts from API
       ansible.builtin.uri:
-        url: "{{ api_host}}/date/{{ update_date }}"
+        url: "{{ api_host}}/date/{{ update_date | urlencode }}"
         return_content: true
       register: api_results
 
@@ -45,9 +45,9 @@
         minutes: 2
     - name: Update API - Patch Complete
       ansible.builtin.uri:
-        url: "{{ api_host}}/{{ item.ID }}"
+        url: "{{ api_host}}/{{ id }}"
         method: PUT
         body_format: json
         body:
           Status: "PatchComplete"
-          PatchJobID: "{{ tower_job_id }}"
+          PatchJobID: "{{ tower_job_id | string }}"

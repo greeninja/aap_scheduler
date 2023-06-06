@@ -4,11 +4,11 @@
   connection: local
   gather_facts: false
   vars:
-    api+host: "http://127.0.0.1:8080/patch/"
+    api_host: "http://192.168.122.12:8080/patch"
   tasks:
     # Using shell as ansible_date_time fact returns UTC
     - name: Set update date
-      shell: "date +'%Y-%m-%d' -d '+7 days'"
+      shell: "date +'%Y-%m-%d %H:%M' -d '+7 days'"
       register: shell_update_date
 
     - name: Set update date
@@ -19,9 +19,13 @@
       debug:
         var: update_date
 
+    - name: Debug url
+      debug:
+        msg: "{{ api_host}}/date/{{ update_date | urlencode }}"
+
     - name: Get hosts from API
       ansible.builtin.uri:
-        url: "{{ api_host}}/date/{{ update_date }}"
+        url: "{{ api_host}}/date/{{ update_date | urlencode }}"
         return_content: true
       register: api_results
 
@@ -38,13 +42,17 @@
   vars:
     api_host: "http://192.168.122.12:8080/patch"
   tasks:
+    - name: Debug inventory
+      debug:
+        var: id
+
     - name: Pause for 2 minutes to simulate pre checks
       ansible.builtin.pause:
         minutes: 2
 
     - name: Update API - Pre Checks Complete
       ansible.builtin.uri:
-        url: "{{ api_host}}/{{ item.ID }}"
+        url: "{{ api_host}}/{{ id }}"
         method: PUT
         body_format: json
         body:
