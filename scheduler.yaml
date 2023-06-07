@@ -2,9 +2,6 @@
 - name: Create Schedules
   hosts: 127.0.0.1
   connection: local
-  vars:
-    db_host: 192.168.122.12
-    db_port: 3306
   tasks:
     - name: Set update date query
       set_fact:
