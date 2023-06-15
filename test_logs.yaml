@@ -10,7 +10,7 @@
         state: directory
         mode: "0755"
     - name: Echo random words to a log file
-      shell: echo "this is a test" >> "/mnt/{{ inventory_hostname }}/log.txt"
+      shell: echo "this is a test" >> "/mnt/{{ inventory_hostname }}/{{ patch_version }}.log"
     - name: Pause for 5 minutes
       pause:
         minutes: 5
