@@ -20,7 +20,7 @@
 
     - name: Build schedules fact
       set_fact: schedules="{{ schedules | default([]) + [item.json] }}"
-      loop: schedules.results
+      loop: schedules_raw.results
 
     - debug:
         var: schedules
