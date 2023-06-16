@@ -19,7 +19,7 @@
       loop: "{{ template_ids }}"
 
     - debug:
-        var: schedules_raw
+        var: schedules_raw.results
 
     - name: Build schedules fact
       set_fact: schedules="{{ schedules | default([]) + [item.json] }}"
