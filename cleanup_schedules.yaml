@@ -18,25 +18,19 @@
       register: schedules_raw
       loop: "{{ template_ids }}"
 
-    - debug:
-        var: schedules_raw.results
-
     - name: Build schedules fact
       set_fact: schedules="{{ schedules | default([]) + item.json.results }}"
       loop: "{{ schedules_raw.results }}"
 
-    - debug:
-        var: schedules | length
-
-    # - name: Cleanup Schedules
-    #   ansible.builtin.uri:
-    #     url: "{{ controller_uri }}/api/v2/schedules/{{ item.id }}/"
-    #     body_format: json
-    #     validate_certs: false
-    #     return_content: true
-    #     method: DELETE
-    #     status_code: [200, 201, 204]
-    #     headers:
-    #       Content-Type: application/json
-    #       Authorization: "Bearer {{ controller_token }}"
-    #   loop: "{{ schedules.json.results | selectattr('next_run','none') }}"
+    - name: Cleanup Schedules
+      ansible.builtin.uri:
+        url: "{{ controller_uri }}/api/v2/schedules/{{ item.id }}/"
+        body_format: json
+        validate_certs: false
+        return_content: true
+        method: DELETE
+        status_code: [200, 201, 204]
+        headers:
+          Content-Type: application/json
+          Authorization: "Bearer {{ controller_token }}"
+      loop: "{{ schedules | selectattr('next_run','none') }}"
