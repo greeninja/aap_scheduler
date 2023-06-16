@@ -18,6 +18,9 @@
       register: schedules_raw
       loop: "{{ template_ids }}"
 
+    - debug:
+        var: schedules_raw
+
     - name: Build schedules fact
       set_fact: schedules="{{ schedules | default([]) + [item.json] }}"
       loop: schedules_raw.results
