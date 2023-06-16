@@ -19,8 +19,12 @@
       loop: "{{ template_ids }}"
 
     - name: Build schedules fact
-      set_fact: schedules="{{ schedules | default([]) + item.json.results }}"
+      set_fact:
+        schedules: "{{ schedules | default([]) + item.json.results }}"
       loop: "{{ schedules_raw.results }}"
+
+    - debug:
+        var: schedules
 
     - name: Cleanup Schedules
       ansible.builtin.uri:
