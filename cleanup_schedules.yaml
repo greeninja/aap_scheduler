@@ -22,8 +22,8 @@
         var: schedules_raw.results
 
     - name: Build schedules fact
-      set_fact: schedules="{{ schedules | default([]) + [item.json.results] }}"
-      loop: schedules_raw.results
+      set_fact: schedules="{{ schedules | default([]) + item.json.results }}"
+      loop: "{{ schedules_raw.results }}"
 
     - debug:
         var: schedules
