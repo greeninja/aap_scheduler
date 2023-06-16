@@ -16,10 +16,6 @@
       set_fact:
         update_date: "{{ shell_update_date.stdout }}"
 
-    - name: Query filter
-      debug:
-        var: update_date
-
     - name: Get hosts from MySQL
       community.mysql.mysql_query:
         login_host: "{{ db_host }}"
@@ -27,7 +23,7 @@
         login_user: root
         login_password: "{{ mysql_passwd }}"
         login_port: "{{ db_port }}"
-        query: 'select * from patch where DATE(update_time) == "{{ update_date }}%" and pre_checks_complete=1;'
+        query: 'select * from patch where DATE(update_time) == "{{ update_date }}" and pre_checks_complete=1;'
       register: mysql_results
 
     - name: Add hosts to Inventory
