@@ -9,7 +9,7 @@
   tasks:
     # Using shell as ansible_date_time fact returns UTC
     - name: Get update date
-      shell: "TZ=utc date +'%Y-%m-%d %H:%M'"
+      shell: "TZ=UTC date +'%Y-%m-%d %H:%M'"
       register: shell_update_date
 
     - name: Set update date
