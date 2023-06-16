@@ -7,9 +7,9 @@
       shell: date -d "+ 1 month" "+%Y-%m-%d 23:59:59"
       register: update_date_shell
 
-    - name: Set update_time fact
+    - name: Set update_date fact
       set_fact:
-        update_time: "{{ update_date_shell.stdout }}"
+        update_date: "{{ update_date_shell.stdout }}"
 
     - name: Get hosts from MySQL
       community.mysql.mysql_query:
