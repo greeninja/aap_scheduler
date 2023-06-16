@@ -68,7 +68,7 @@
 
 - name: Set update date
   set_fact:
-    update_date_time: "{{ '%Y-%m-%d %H:%M:00' | item.update_time | to_datetime('%Y-%m-%dT%H:%M:00')}}"
+    update_date_time: "{{ item.update_time | to_datetime('%Y-%m-%dT%H:%M:00')}}"
 
 - name: Set patch rrule fact
   set_fact:
