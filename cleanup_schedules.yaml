@@ -15,8 +15,12 @@
         headers:
           Content-Type: application/json
           Authorization: "Bearer {{ controller_token }}"
-      register: schedules
+      register: schedules_raw
       loop: "{{ template_ids }}"
+
+    - name: Build schedules fact
+      set_fact: schedules="{{ schedules | default([]) + [item.json] }}"
+      loop: schedules.results
 
     - debug:
         var: schedules
