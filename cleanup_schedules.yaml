@@ -6,7 +6,7 @@
   tasks:
     - name: Get Pre Check Schedules
       ansible.builtin.uri:
-        url: "{{ controller_uri }}/api/v2/job_templates/{{ pre_check_template_id }}/schedules/"
+        url: "{{ controller_uri }}/api/v2/job_templates/{{ item }}/schedules/"
         body_format: json
         validate_certs: false
         return_content: true
@@ -15,43 +15,21 @@
         headers:
           Content-Type: application/json
           Authorization: "Bearer {{ controller_token }}"
-      register: pre_check_schedules
+      register: schedules
+      loop: "{{ template_ids }}"
 
-    - name: Cleanup Pre Check Schedules
-      ansible.builtin.uri:
-        url: "{{ controller_uri }}/api/v2/schedules/{{ item.id }}/"
-        body_format: json
-        validate_certs: false
-        return_content: true
-        method: DELETE
-        status_code: [200, 201, 204]
-        headers:
-          Content-Type: application/json
-          Authorization: "Bearer {{ controller_token }}"
-      loop: "{{ pre_check_schedules.json.results | selectattr('next_run','none') }}"
+    - debug:
+        var: schedules
 
-    - name: Get Patch Schedules
-      ansible.builtin.uri:
-        url: "{{ controller_uri }}/api/v2/job_templates/{{ patch_template_id }}/schedules/"
-        body_format: json
-        validate_certs: false
-        return_content: true
-        method: GET
-        status_code: [200, 201]
-        headers:
-          Content-Type: application/json
-          Authorization: "Bearer {{ controller_token }}"
-      register: patch_schedules
-
-    - name: Cleanup Patch Schedules
-      ansible.builtin.uri:
-        url: "{{ controller_uri }}/api/v2/schedules/{{ item.id }}/"
-        body_format: json
-        validate_certs: false
-        return_content: true
-        method: DELETE
-        status_code: [200, 201, 204]
-        headers:
-          Content-Type: application/json
-          Authorization: "Bearer {{ controller_token }}"
-      loop: "{{ patch_schedules.json.results | selectattr('next_run','none') }}"
+    # - name: Cleanup Schedules
+    #   ansible.builtin.uri:
+    #     url: "{{ controller_uri }}/api/v2/schedules/{{ item.id }}/"
+    #     body_format: json
+    #     validate_certs: false
+    #     return_content: true
+    #     method: DELETE
+    #     status_code: [200, 201, 204]
+    #     headers:
+    #       Content-Type: application/json
+    #       Authorization: "Bearer {{ controller_token }}"
+    #   loop: "{{ schedules.json.results | selectattr('next_run','none') }}"
