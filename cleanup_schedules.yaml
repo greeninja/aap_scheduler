@@ -26,7 +26,7 @@
       loop: "{{ schedules_raw.results }}"
 
     - debug:
-        var: schedules
+        var: schedules | length
 
     # - name: Cleanup Schedules
     #   ansible.builtin.uri:
