@@ -103,7 +103,7 @@
     login_user: root
     login_password: "{{ mysql_passwd }}"
     login_port: "{{ db_port }}"
-    query: "update patch set patch_schedule_id=%s where id=%s"
+    query: "update patch set patch_schedule_id=%s, patch_created=1 where id=%s"
     positional_args:
       - "{{ update_schedule.json.id }}"
       - "{{ item.id }}"
