@@ -19,7 +19,7 @@
       loop: "{{ template_ids }}"
 
     - debug:
-        var: schedules.json.results | length
+        var: schedules.json.results
 
     # - name: Cleanup Schedules
     #   ansible.builtin.uri:
