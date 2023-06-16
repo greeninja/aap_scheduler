@@ -1,6 +1,9 @@
 ---
 ## Pre check schedules
 
+- debug:
+    var: item.update_time
+
 - name: Set pre_check date
   set_fact:
     pre_check_date: "{{ '%Y-%m-%d %H:%M:00' | strftime(( (item.update_time | to_datetime('%Y-%m-%d %H:%M:%S')).strftime('%s'))|int - (60*60*24*7)) }}"
