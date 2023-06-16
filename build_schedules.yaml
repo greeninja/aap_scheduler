@@ -3,7 +3,7 @@
 
 - name: Set pre_check date
   set_fact:
-    pre_check_date: "{{ '%Y-%m-%dT%H:%M:00Z' | strftime(( (item.update_time | to_datetime('%Y-%m-%d %H:%M:%S')).strftime('%s'))|int - (60*60*24*7)) }}"
+    pre_check_date: "{{ '%Y-%m-%dT%H:%M:00Z' | strftime(( (item.update_time | to_datetime('%Y-%m-%dT%H:%M:%S')).strftime('%s'))|int - (60*60*24*7)) }}"
 
 - name: Set rrule fact
   set_fact:
