@@ -16,6 +16,9 @@
       set_fact:
         update_date: "{{ shell_update_date.stdout }}"
 
+    - debug:
+        var: update_date
+
     - name: Get hosts from MySQL
       community.mysql.mysql_query:
         login_host: "{{ db_host }}"
