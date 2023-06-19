@@ -6,7 +6,7 @@
   tasks:
     - name: Get Pre Check Schedules
       ansible.builtin.uri:
-        url: "{{ controller_uri }}/api/v2/job_templates/{{ item }}/schedules/"
+        url: "{{ controller_uri }}/api/v2/job_templates/{{ item }}/schedules?order_by=-next_run&page_size=400"
         body_format: json
         validate_certs: false
         return_content: true
@@ -26,15 +26,21 @@
     - debug:
         var: schedules
 
-    - name: Cleanup Schedules
-      ansible.builtin.uri:
-        url: "{{ controller_uri }}/api/v2/schedules/{{ item.id }}/"
-        body_format: json
-        validate_certs: false
-        return_content: true
-        method: DELETE
-        status_code: [200, 201, 204]
-        headers:
-          Content-Type: application/json
-          Authorization: "Bearer {{ controller_token }}"
-      loop: "{{ schedules | selectattr('next_run','none') }}"
+    - debug:
+        var: schedules | length
+
+    - debug:
+        var: schedules | selectattr('next_run','none') | length
+
+    # - name: Cleanup Schedules
+    #   ansible.builtin.uri:
+    #     url: "{{ controller_uri }}/api/v2/schedules/{{ item.id }}/"
+    #     body_format: json
+    #     validate_certs: false
+    #     return_content: true
+    #     method: DELETE
+    #     status_code: [200, 201, 204]
+    #     headers:
+    #       Content-Type: application/json
+    #       Authorization: "Bearer {{ controller_token }}"
+    #   loop: "{{ schedules | selectattr('next_run','none') }}"
