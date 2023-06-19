@@ -33,7 +33,7 @@
         id: "{{ item.id }}"
       loop: "{{ mysql_results.query_result[0] }}"
 
-- name: Run pre checks
+- name: Run updates
   hosts: update
   connection: local
   vars:
