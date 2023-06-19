@@ -9,7 +9,7 @@
   tasks:
     # Using shell as ansible_date_time fact returns UTC
     - name: Set update date
-      shell: "TZ=UTC date +'%Y-%m-%d %H:%M' -d '+7 days'"
+      shell: TZ=UTC date +'%Y-%m-%d %H:%M:00' -d '+7 days'
       register: shell_update_date
 
     - name: Set update date
@@ -26,7 +26,7 @@
         login_user: root
         login_password: "{{ mysql_passwd }}"
         login_port: "{{ db_port }}"
-        query: 'select * from patch where DATE(update_time) = "{{ update_date }}:00" and pre_checks_complete = 0;'
+        query: 'select * from patch where DATE(update_time) = "{{ update_date }}" and pre_checks_complete = 0;'
       register: mysql_results
 
     - name: Add hosts to Inventory
