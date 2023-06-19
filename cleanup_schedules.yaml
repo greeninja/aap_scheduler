@@ -23,15 +23,6 @@
         schedules: "{{ schedules | default([]) + item.json.results }}"
       loop: "{{ schedules_raw.results }}"
 
-    - debug:
-        var: schedules
-
-    - debug:
-        var: schedules | length
-
-    - debug:
-        var: schedules | selectattr('next_run','none') | length
-
     - name: Cleanup Schedules
       ansible.builtin.uri:
         url: "{{ controller_uri }}/api/v2/schedules/{{ item.id }}/"
