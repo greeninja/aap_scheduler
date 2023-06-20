@@ -4,7 +4,7 @@
   connection: local
   tasks:
     - name: Set update date query
-      shell: date -d "+ 1 month" "+%Y-%m-%d 23:59:59"
+      shell: date -d "+ 8 days" "+%Y-%m-%d %H:%M:00"
       register: update_date_shell
 
     - name: Set update_date fact
