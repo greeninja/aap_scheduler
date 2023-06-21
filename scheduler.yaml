@@ -21,37 +21,37 @@
         query: 'select * from patch where DATE(update_time) <= "{{ update_date }}" and pre_checks_created <= 0 or patch_created <= 0 limit 500;'
       register: mysql_results
 
-    - name: Get pre check schedules
-      ansible.builtin.uri:
-        url: "{{ controller_uri }}/api/v2/job_templates/{{ pre_check_template_id }}/schedules?page_size=1000"
-        body_format: json
-        validate_certs: false
-        return_content: true
-        method: GET
-        headers:
-          Content-Type: application/json
-          Authorization: "Bearer {{ controller_token }}"
-      register: pre_check_schedules_data
+    # - name: Get pre check schedules
+    #   ansible.builtin.uri:
+    #     url: "{{ controller_uri }}/api/v2/job_templates/{{ pre_check_template_id }}/schedules?page_size=1000"
+    #     body_format: json
+    #     validate_certs: false
+    #     return_content: true
+    #     method: GET
+    #     headers:
+    #       Content-Type: application/json
+    #       Authorization: "Bearer {{ controller_token }}"
+    #   register: pre_check_schedules_data
 
-    - name: Set pre_check_schedules fact
-      set_fact:
-        pre_check_schedules: "{{ pre_check_schedules_data.json.results }}"
+    # - name: Set pre_check_schedules fact
+    #   set_fact:
+    #     pre_check_schedules: "{{ pre_check_schedules_data.json.results }}"
 
-    - name: Get patch schedules
-      ansible.builtin.uri:
-        url: "{{ controller_uri }}/api/v2/job_templates/{{ patch_template_id }}/schedules/"
-        body_format: json
-        validate_certs: false
-        return_content: true
-        method: GET
-        headers:
-          Content-Type: application/json
-          Authorization: "Bearer {{ controller_token }}"
-      register: patch_schedules_data
+    # - name: Get patch schedules
+    #   ansible.builtin.uri:
+    #     url: "{{ controller_uri }}/api/v2/job_templates/{{ patch_template_id }}/schedules/"
+    #     body_format: json
+    #     validate_certs: false
+    #     return_content: true
+    #     method: GET
+    #     headers:
+    #       Content-Type: application/json
+    #       Authorization: "Bearer {{ controller_token }}"
+    #   register: patch_schedules_data
 
-    - name: Set patch_schedules fact
-      set_fact:
-        patch_schedules: "{{ patch_schedules_data.json.results }}"
+    # - name: Set patch_schedules fact
+    #   set_fact:
+    #     patch_schedules: "{{ patch_schedules_data.json.results }}"
 
     - name: Build schedules
       include_tasks: build_schedules.yaml

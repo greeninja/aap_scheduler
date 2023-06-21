@@ -58,3 +58,4 @@
           - "{{ tower_job_id }}"
           - "{{ ansible_date_time.date }} {{ ansible_date_time.time }}"
           - "{{ id }}"
+## Remove job if no hosts?

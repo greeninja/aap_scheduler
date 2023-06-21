@@ -9,6 +9,22 @@
   set_fact:
     rrule_pre_check: "DTSTART:{{ (pre_check_date | to_datetime('%Y-%m-%d %H:%M:%S')).strftime('%Y%m%dT%H%M00Z') }} RRULE:FREQ=DAILY;INTERVAL=1;COUNT=1"
 
+- name: Get pre check schedule
+  ansible.builtin.uri:
+    url: "{{ controller_uri }}/api/v2/job_templates/{{ pre_check_template_id }}/schedules/?rrule__exact={{ rrule_pre_check | urlencode }}"
+    body_format: json
+    validate_certs: false
+    return_content: true
+    method: GET
+    headers:
+      Content-Type: application/json
+      Authorization: "Bearer {{ controller_token }}"
+  register: pre_check_schedules_data
+
+- name: Set pre_check_schedules fact
+  set_fact:
+    pre_check_schedules: "{{ pre_check_schedules_data.json.results }}"
+
 - name: Create Pre Check Schedule
   ansible.builtin.uri:
     url: "{{ controller_uri }}/api/v2/schedules/"
@@ -70,6 +86,22 @@
 - name: Set patch rrule fact
   set_fact:
     rrule_patch: "DTSTART:{{ (update_date_time | to_datetime('%Y-%m-%d %H:%M:%S')).strftime('%Y%m%dT%H%M00Z') }} RRULE:FREQ=DAILY;INTERVAL=1;COUNT=1"
+
+- name: Get patch schedules
+  ansible.builtin.uri:
+    url: "{{ controller_uri }}/api/v2/job_templates/{{ patch_template_id }}/schedules/?rrule__exact={{ rrule_patch | urlencode }}"
+    body_format: json
+    validate_certs: false
+    return_content: true
+    method: GET
+    headers:
+      Content-Type: application/json
+      Authorization: "Bearer {{ controller_token }}"
+  register: patch_schedules_data
+
+- name: Set patch_schedules fact
+  set_fact:
+    patch_schedules: "{{ patch_schedules_data.json.results }}"
 
 - name: Create Patch Schedule
   ansible.builtin.uri:
