@@ -56,3 +56,6 @@
     - name: Build schedules
       include_tasks: build_schedules.yaml
       loop: "{{ mysql_results.query_result[0] }}"
+      register: _build_schedules
+      async: 30
+      poll: 5
