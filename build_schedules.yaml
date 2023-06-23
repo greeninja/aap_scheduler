@@ -64,6 +64,10 @@
   when: pre_check_schedule.changed
   register: precheck_update
 
+- debug:
+    var: precheck_update
+  when: precheck_update.changed
+
 - name: Update DB - Pre Checks scheduled
   community.mysql.mysql_query:
     login_host: "{{ db_host }}"
@@ -81,6 +85,7 @@
 
 - debug:
     var: precheck_update
+  when: precheck_update.changed
 
 ## Patch Schedules
 
@@ -144,6 +149,10 @@
   when: update_schedule.changed
   register: patch_update
 
+- debug:
+    var: patch_update
+  when: patch_update.changed
+
 - name: Update DB - Patching scheduled
   community.mysql.mysql_query:
     login_host: "{{ db_host }}"
@@ -160,3 +169,4 @@
 
 - debug:
     var: patch_update
+  when: patch_update.changed
