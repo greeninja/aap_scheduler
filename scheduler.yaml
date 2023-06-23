@@ -24,6 +24,6 @@
     - debug:
         var: mysql_results.query_result[0] | length
 
-    # - name: Build schedules
-    #   include_tasks: build_schedules.yaml
-    #   loop: "{{ mysql_results.query_result[0] }}"
+    - name: Build schedules
+      include_tasks: build_schedules.yaml
+      loop: "{{ mysql_results.query_result[0] }}"
